@@ -1,0 +1,83 @@
+version: '3.0'
+
+# Service
+services:
+  mysql:
+    image: mysql:latest
+    command: --default_authentication_plugin=mysql_native_password
+    #restart: always
+    volumes:
+      - /mysql/data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      TZ: Asia/Taipei
+    ports:
+      - "3306:3306"
+    restart: always
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    user: root
+    ports:
+      - 1433:1433
+    volumes:
+      - /sqlserver/data:/var/opt/mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=1qaz@WSX
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    restart: always
+
+  ftp:
+    image: stilliard/pure-ftpd:latest
+    ports:
+      - 21:21
+      - 30000-30009:30000-30009
+    volumes:
+      - /ftp/data:/home/upload
+      - /ftp/passwd:/etc/pure-ftpd/passwd
+    environment:
+      PUBLICHOST: localhost
+      FTP_USER_NAME: root
+      FTP_USER_PASS: 123456
+      FTP_USER_HOME: /home/root
+    restart: always
+
+  sftp:
+    image: atmoz/sftp:latest
+    volumes:
+      - /sftp/data:/home/upload
+    ports:
+      - 22:22
+    command: local:123456:1001
+    restart: always
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+    restart: always
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_CREATE_TOPICS: "domain_event_broadcast:1:1,domain_event_low_broadcast:1:1"
+    restart: always

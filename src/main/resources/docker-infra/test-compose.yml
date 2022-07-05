@@ -1,0 +1,26 @@
+version: "3.0"
+
+# Service
+services:
+  ftp:
+    image: stilliard/pure-ftpd
+    ports:
+      - 21:21
+      - 30000-30009:30000-30009
+    volumes:
+      - /ftp/data:/home/upload
+      - /ftp/passwd:/etc/pure-ftpd/passwd
+    environment:
+      PUBLICHOST: localhost
+      FTP_USER_NAME: root
+      FTP_USER_PASS: 123456
+      FTP_USER_HOME: /home/root
+    restart: always
+
+  sftp:
+    image: atmoz/sftp
+    volumes:
+      - /sftp/data:/home/upload
+    ports:
+      - 22:22
+    command: local:123456:1001
