@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: demo
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+  task:
+    execution:
+      shutdown:
+        await-termination: true
+        await-termination-period: 20s
+    servlet:
+      multipart:
+        max-file-size: 150MB
+        max-request-size: 150MB
+  datasource:
+    dynamic:
+      hikari:
+        max-pool-size: 10
+        min-idle: 10
+      primary: primary
+      datasource:
+        primary:
+          url: jdbc:sqlserver://localhost:1433;dataBaseName=rd4_appsvc_master;encrypt=true;trustServerCertificate=true
+          username: SA
+          password: 1qaz@WSX
+          driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+        readOnly:
+          url: jdbc:sqlserver://192.168.12.161:1433;dataBaseName=JKOPay_09201;ApplicationIntent=ReadOnly;encrypt=true;trustServerCertificate=true
+          username: sa
+          password: Jkos7777
+          driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+server:
+  shutdown: graceful
+  servlet:
+    context-path: /demo
+  port: 8080
+
+logging:
+  level:
+    root: info
+    springframework.boot.devtools: error
+
+#以上為 3rd party lib 設定, 以下為專案內設定

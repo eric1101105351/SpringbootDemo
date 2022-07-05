@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
+    <property name="consoleLogPattern"
+              value="%date [%level] [${HOSTNAME}] [%thread] [%X{correlationId}] %logger{50}[%L] : %X{anyLogStart}%msg%n%rEx{full,
+     java.lang.reflect.Method,
+     sun.reflect,
+     org.apache.catalina,
+     org.springframework.aop,
+     org.springframework.security,
+     org.springframework.transaction,
+     org.springframework.web,
+     org.springframework.beans,
+     org.springframework.cglib,
+     net.sf.cglib,
+     org.apache.tomcat.util,
+     org.apache.coyote,
+     ByCGLIB,
+     BySpringCGLIB,
+     com.google.common.cache.LocalCache$,
+     javax.servlet.http.HttpServlet,
+     org.springframework.boot.actuate.metrics,
+     java.base/jdk.internal.reflect
+}   "/>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${consoleLogPattern}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>500</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>true</includeCallerData>
+        <appender-ref ref="console"/>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="async"/>
+    </root>
+</configuration>
