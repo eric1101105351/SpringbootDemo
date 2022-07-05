@@ -9,10 +9,10 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AsyncResult {
+public class AsyncResult<T> {
 
     private int index;
-    private Object result;
+    private T result;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
 

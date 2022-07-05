@@ -2,7 +2,7 @@ spring:
   application:
     name: demo
   lifecycle:
-    timeout-per-shutdown-phase: 20s
+    timeout-per-shutdown-phase: 1s
   task:
     execution:
       shutdown:

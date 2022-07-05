@@ -45,20 +45,20 @@ public class QueryService {
         AtomicLong timeCount = new AtomicLong(0);
         CountDownLatch countDownLatch = new CountDownLatch(runTimes);
         for (int i = 0; i < runTimes; i++) {
-            CompletableFuture<AsyncResult> asyncResultCompletableFuture = CompletableFuture.supplyAsync(() -> {
-                int thisIndex = executeCount.getAndIncrement();
+            CompletableFuture.supplyAsync(() -> {
+                int index = executeCount.getAndIncrement();
                 LocalDateTime startAt = LocalDateTime.now();
                 List<String> queryResult = mapper.listJkosIdByJkosListHashTag(testList);
                 LocalDateTime endAt = LocalDateTime.now();
-                AsyncResult result = new AsyncResult(thisIndex, queryResult, startAt, endAt);
+                AsyncResult<List<String>> result = new AsyncResult(index, queryResult, startAt, endAt);
                 return result;
-            }, taskExecutor).whenComplete((result, ex) -> {
-                List<String> queryResult = (List<String>) result.getResult();
+            }, taskExecutor).whenCompleteAsync((result, ex) -> {
+                List<String> queryResult = result.getResult();
                 log.info("第 {} 次查詢結束, 查詢資料筆數 : {}, 耗時 : {} ms", result.getIndex(), queryResult.size(), Duration.between(result.getStartAt(),
                         result.getEndAt()).toMillis());
                 timeCount.getAndAdd(Duration.between(result.getStartAt(), result.getEndAt()).toMillis());
                 countDownLatch.countDown();
-            });
+            }, taskExecutor);
         }
         try {
             countDownLatch.await();
